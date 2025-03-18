@@ -1,13 +1,19 @@
-version: '3.8'
-
+version: '3'
 services:
-  ddddocr-api:
-    build: .
-    ports:
-      - "8000:8000"
-    volumes:
-      - .:/app
-    environment:
-      - API_TOKEN=your_secure_token_here
-      - DEBUG=1
+  ddddocr-fastapi:
+    image: xjxjin/ddddocr-fastapi:sha-ae4ea5b
     restart: always
+    container_name: ddddocr-fastapi
+    ports:
+      - "8081:8000"
+    #volumes:
+    #  - /home/docker/volumes/ddddocr-fastapi-data/_data:/ddddocr-fastapi-data
+    environment:
+      - TZ=Asia/Shanghai
+      - API_TOKEN=xxxxxx
+      - DEBUG=1
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"

@@ -70,7 +70,7 @@ async def get_image_from_url(url: str) -> bytes:
         raise HTTPException(status_code=400, detail=f"无法从URL获取图像: {str(e)}")
 
 
-@app.post("/ocr", response_model=APIResponse)
+@app.post("/ddddocr-fastapi/ocr", response_model=APIResponse)
 async def ocr_endpoint(
         file: Optional[UploadFile] = File(None),
         image: Optional[str] = Form(None),
@@ -90,7 +90,7 @@ async def ocr_endpoint(
         return APIResponse(code=500, message=str(e))
 
 
-@app.post("/ocr_from_url", response_model=APIResponse)
+@app.post("/ddddocr-fastapi/ocr_from_url", response_model=APIResponse)
 async def ocr_from_url_endpoint(
         url: str = Form(...),
         probability: bool = Form(False),
@@ -106,7 +106,7 @@ async def ocr_from_url_endpoint(
         return APIResponse(code=500, message=str(e))
 
 
-@app.post("/slide_match", response_model=APIResponse)
+@app.post("/ddddocr-fastapi/slide_match", response_model=APIResponse)
 async def slide_match_endpoint(
         target_file: Optional[UploadFile] = File(None),
         background_file: Optional[UploadFile] = File(None),
@@ -127,7 +127,7 @@ async def slide_match_endpoint(
         return APIResponse(code=500, message=str(e))
 
 
-@app.post("/detection", response_model=APIResponse)
+@app.post("/ddddocr-fastapi/detection", response_model=APIResponse)
 async def detection_endpoint(
         file: Optional[UploadFile] = File(None),
         image: Optional[str] = Form(None),
