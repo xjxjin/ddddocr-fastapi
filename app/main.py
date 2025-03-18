@@ -12,12 +12,34 @@ app = FastAPI()
 from starlette.datastructures import UploadFile as StarletteUploadFile
 
 
-async def verify_token(token: str = Header(...)):
+async def verify_token(
+    authorization: Optional[str] = Header(None),
+    token: Optional[str] = Header(None)
+):
     # 从环境变量获取有效token
     valid_token = os.environ.get("API_TOKEN", "default_token")
-    if token != valid_token:
+    
+    # 检查是否提供了Authorization header
+    provided_token = None
+    if authorization:
+        # 解析Authorization header (通常格式为"Bearer <token>")
+        if authorization.startswith("Bearer "):
+            provided_token = authorization.split("Bearer ")[1].strip()
+        else:
+            provided_token = authorization
+    # 如果没有Authorization，则使用token header
+    elif token:
+        provided_token = token
+    
+    # 如果没有提供任何token，则返回错误
+    if not provided_token:
+        raise HTTPException(status_code=401, detail="未提供token")
+    
+    # 验证token
+    if provided_token != valid_token:
         raise HTTPException(status_code=401, detail="无效的token")
-    return token
+    
+    return provided_token
 
 
 async def decode_image(image: Union[UploadFile, StarletteUploadFile, str, None]) -> bytes:
