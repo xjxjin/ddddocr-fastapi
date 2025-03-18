@@ -1,357 +1,311 @@
-# 🚀 DdddOcr API
+# 验证码识别服务 API 调用示例
 
-![DdddOcr Logo](https://cdn.wenanzhe.com/img/logo.png!/crop/700x500a400a500)
+## 简介
+本项目提供了验证码识别服务的 API 调用示例，包含多种调用方式和功能演示，帮助用户快速上手使用验证码识别服务。
 
-> 基于 FastAPI 和 DdddOcr 的高性能 OCR API 服务，提供图像文字识别、滑动验证码匹配和目标检测功能。
-> 
-> [自营各类GPT聚合平台](https://juxiangyun.com)
+## 功能说明
+1. **OCR 验证码识别 - 文件上传方式**：通过上传本地验证码图片文件进行识别。
+2. **OCR 验证码识别 - Base64 编码方式**：将验证码图片转为 Base64 编码后进行识别。
+3. **从 URL 识别验证码**：通过提供验证码图片的 URL 进行识别。
+4. **滑动验证码匹配**：对滑动验证码的滑块和背景图进行匹配分析。
+5. **图像文本检测**：检测图像中的文本内容及其位置。
+6. **使用 token header 进行身份验证**：演示使用 token 在请求头中进行身份验证的方式。
 
-## 📋 目录
+## 使用方法
 
-- [系统要求](#-系统要求)
-- [安装和启动](#-安装和启动)
-- [API 端点](#-api-端点)
-- [API 调用示例](#-api-调用示例)
-- [注意事项](#-注意事项)
-- [故障排除](#-故障排除)
-- [许可证](#-许可证)
+### 环境准备
+- Python 3.x
+- requests 库
+- base64 模块
+- json 模块
 
-## 💻 系统要求
+### 配置信息
+在代码中修改以下配置信息以适配你的环境：
+```python
+BASE_URL = "http://localhost:8000"  # 替换为实际服务地址
+API_TOKEN = "your_secure_token_here"  # 替换为实际 token
+```
 
-| 组件 | 版本 |
-|------|------|
-| 操作系统 | Linux（推荐 Ubuntu 20.04 LTS 或更高版本）|
-| Docker | 20.10 或更高 |
-| Docker Compose | 1.29 或更高 |
+### 运行示例
+运行脚本后，将依次执行所有示例函数，展示不同 API 接口的调用方式和结果。
 
-## 🚀 安装和启动
+## 注意事项
+1. 确保提供的验证码图片路径、URL 及其他参数正确无误。
+2. 根据实际需求调整请求参数，如 `probability`、`png_fix` 等。
+3. 处理好文件的打开与关闭操作，避免资源泄露。
+4. 对于网络请求，注意异常处理，以应对网络波动或其他不可预见的情况。
+5. 确保你的网络环境可以正常访问目标 API 服务地址。
 
-1. **克隆仓库**
-   ```bash
-   git clone https://github.com/your-repo/ddddocr-api.git
-   cd ddddocr-api
-   ```
+## 示例运行输出
+运行脚本后，将输出每个示例的请求状态码和响应内容，帮助你了解 API 调用的结果。
 
-2. **启动服务**
-   
-   有三种方式可以启动应用：
+## 联系与支持
+如在使用过程中遇到问题，或有任何建议，请及时与我们联系。
 
-   a. 使用 docker启动：
-      1. 构建 Docker 镜像 [一键docker环境服务器购买，可一元试用](https://www.rainyun.com/ddddocr_) 
-      2. 打包镜像
-          ```bash
-          docker build -t ddddocr-api .
-          ```
-      3. 启动镜像
-         ```bash
-         docker run -d -p 8000:8000 --name ddddocr-api-container ddddocr-api
-         ```
-
-   b. 使用 python 命令直接运行：
-      ```bash
-      python app/main.py
-      ```
-   
-   b. 使用 uvicorn（支持热重载，适合开发）：
-      ```bash
-      uvicorn app.main:app --reload
-      ```
-
-
-3. **验证服务**
-   ```bash
-   curl http://localhost:8000/docs
-   ```
-   > 如果成功，您将看到 Swagger UI 文档页面。
-   
-4. **停止服务**
-
-- 如果使用 Docker：
-  ```bash
-  docker stop ddddocr-api-container
-  ```
-
-- 如果使用 Docker Compose：
-  ```bash
-  docker-compose down
-  ```
-  
-5. **查看日志**
-
-- 如果使用 Docker：
-  ```bash
-  docker logs ddddocr-api-container
-  ```
-
-- 如果使用 Docker Compose：
-  ```bash
-  docker-compose logs
-  ```
-
-## 🔌 API 端点
-
-### 1. OCR 识别
-
-🔗 **端点**：`POST /ocr`
-
-| 参数 | 类型 | 描述 |
-|------|------|------|
-| `file` | File | 图片文件（可选） |
-| `image` | String | Base64 编码的图片字符串（可选） |
-| `probability` | Boolean | 是否返回概率（默认：false） |
-| `charsets` | String | 字符集（可选） |
-| `png_fix` | Boolean | 是否进行 PNG 修复（默认：false） |
-
-### 2. 滑动验证码匹配
-
-🔗 **端点**：`POST /slide_match`
-
-| 参数                                                                                        | 类型                                                                                         | 描述                                                                                         |
-|-------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
-| `target_file`                                                                             | File                                                                                       | 目标图片文件（可选）需要与target字段同时使用                                                                  |
-| `target`                                                                                  | String                                                                                     | Base64 编码的目标图片字符串（可选） 需要与target_file字段同时使用                                                 |
-| `background_file`                                                                         | File                                                                                       | 背景图片文件（可选）    需要与background字段同时使用                                                          |
-| `background`                                                                              | String                                                                                     | Base64 编码的背景图片字符串（可选）  需要与background_file字段同时使用                                            |
-| `simple_target`                                                                           | Boolean                                                                                    | 是否使用简单目标（默认：false）                                                                         |
-|| |  `target_file`和`target` 为一组字段，`background_file`和`background` 为一组字段， 两组字段不可同时使用，同时使用则仅一组会生效 |
-
-
-### 3. 目标检测
-
-🔗 **端点**：`POST /detection`
-
-| 参数 | 类型 | 描述 |
-|------|------|------|
-| `file` | File | 图片文件（可选） |
-| `image` | String | Base64 编码的图片字符串（可选） |
-
-## 📘 API 调用示例
-
-<details>
-<summary>Python</summary>
 
 ```python
 import requests
 import base64
+import json
 
-url = "http://localhost:8000/ocr"
-image_path = "path/to/your/image.jpg"
+"""
+验证码识别服务API调用示例
+包含所有API接口的调用示例
+"""
 
-with open(image_path, "rb") as image_file:
-    encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+# API配置信息
+BASE_URL = "http://localhost:8000"  # 替换为实际服务地址
+API_TOKEN = "your_secure_token_here"  # 替换为实际token
 
-data = {
-    "image": encoded_string,
-    "probability": False,
-    "png_fix": False
-}
 
-response = requests.post(url, data=data)
-print(response.json())
-```
-</details>
-<details>
-<summary>Node.js</summary>
-
-```javascript
-const axios = require('axios');
-const fs = require('fs');
-
-const url = 'http://localhost:8000/ocr';
-const imagePath = 'path/to/your/image.jpg';
-
-const imageBuffer = fs.readFileSync(imagePath);
-const base64Image = imageBuffer.toString('base64');
-
-const data = {
-  image: base64Image,
-  probability: false,
-  png_fix: false
-};
-
-axios.post(url, data)
-  .then(response => {
-    console.log(response.data);
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
-```
-</details>
-
-<details>
-<summary>C#</summary>
-
-```csharp
-using System;
-using System.Net.Http;
-using System.IO;
-using System.Threading.Tasks;
-
-class Program
-{
-    static async Task Main(string[] args)
-    {
-        var url = "http://localhost:8000/ocr";
-        var imagePath = "path/to/your/image.jpg";
-
-        var imageBytes = File.ReadAllBytes(imagePath);
-        var base64Image = Convert.ToBase64String(imageBytes);
-
-        var client = new HttpClient();
-        var content = new MultipartFormDataContent();
-        content.Add(new StringContent(base64Image), "image");
-        content.Add(new StringContent("false"), "probability");
-        content.Add(new StringContent("false"), "png_fix");
-
-        var response = await client.PostAsync(url, content);
-        var result = await response.Content.ReadAsStringAsync();
-        Console.WriteLine(result);
+def demo_ocr_file():
+    """
+    示例1: OCR验证码识别 - 文件上传方式
+    """
+    print("\n===== 示例1: OCR验证码识别(文件上传) =====")
+    
+    # 设置请求头
+    headers = {
+        "Authorization": f"Bearer {API_TOKEN}"
     }
-}
-```
-</details>
+    
+    # API端点
+    url = f"{BASE_URL}/ocr"
+    
+    try:
+        # 准备文件和参数
+        captcha_file_path = "captcha.png"  # 替换为实际验证码图片路径
+        
+        files = {
+            "file": open(captcha_file_path, "rb")
+        }
+        
+        data = {
+            "probability": "False",
+            "png_fix": "False"
+        }
+        
+        # 发送请求
+        response = requests.post(url, headers=headers, files=files, data=data)
+        
+        # 输出结果
+        print(f"状态码: {response.status_code}")
+        print(f"响应内容: {json.dumps(response.json(), indent=2, ensure_ascii=False)}")
+        
+        # 关闭文件
+        files["file"].close()
+        
+    except Exception as e:
+        print(f"请求失败: {str(e)}")
 
-<details>
-<summary>PHP</summary>
 
-```php
-<?php
-
-$url = 'http://localhost:8000/ocr';
-$imagePath = 'path/to/your/image.jpg';
-
-$imageData = base64_encode(file_get_contents($imagePath));
-
-$data = array(
-    'image' => $imageData,
-    'probability' => 'false',
-    'png_fix' => 'false'
-);
-
-$options = array(
-    'http' => array(
-        'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-        'method'  => 'POST',
-        'content' => http_build_query($data)
-    )
-);
-
-$context  = stream_context_create($options);
-$result = file_get_contents($url, false, $context);
-
-echo $result;
-?>
-```
-</details>
-
-<details>
-<summary>Go</summary>
-
-```go
-package main
-
-import (
-    "bytes"
-    "encoding/base64"
-    "encoding/json"
-    "fmt"
-    "io/ioutil"
-    "net/http"
-    "net/url"
-)
-
-func main() {
-    apiURL := "http://localhost:8000/ocr"
-    imagePath := "path/to/your/image.jpg"
-
-    imageData, err := ioutil.ReadFile(imagePath)
-    if err != nil {
-        panic(err)
+def demo_ocr_base64():
+    """
+    示例2: OCR验证码识别 - Base64编码方式
+    """
+    print("\n===== 示例2: OCR验证码识别(Base64编码) =====")
+    
+    # 设置请求头
+    headers = {
+        "Authorization": f"Bearer {API_TOKEN}"
     }
+    
+    # API端点
+    url = f"{BASE_URL}/ocr"
+    
+    try:
+        # 读取图片并转为Base64
+        captcha_file_path = "captcha.png"  # 替换为实际验证码图片路径
+        
+        with open(captcha_file_path, "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read()).decode("utf-8")
+        
+        # 准备请求数据
+        data = {
+            "image": encoded_string,
+            "probability": "False",
+            "png_fix": "False"
+        }
+        
+        # 发送请求
+        response = requests.post(url, headers=headers, data=data)
+        
+        # 输出结果
+        print(f"状态码: {response.status_code}")
+        print(f"响应内容: {json.dumps(response.json(), indent=2, ensure_ascii=False)}")
+        
+    except Exception as e:
+        print(f"请求失败: {str(e)}")
 
-    base64Image := base64.StdEncoding.EncodeToString(imageData)
 
-    data := url.Values{}
-    data.Set("image", base64Image)
-    data.Set("probability", "false")
-    data.Set("png_fix", "false")
-
-    resp, err := http.PostForm(apiURL, data)
-    if err != nil {
-        panic(err)
+def demo_ocr_from_url():
+    """
+    示例3: 从URL识别验证码
+    """
+    print("\n===== 示例3: 从URL识别验证码 =====")
+    
+    # 设置请求头
+    headers = {
+        "Authorization": f"Bearer {API_TOKEN}"
     }
-    defer resp.Body.Close()
+    
+    # API端点
+    url = f"{BASE_URL}/ocr_from_url"
+    
+    try:
+        # 准备请求数据
+        image_url = "https://example.com/captcha.jpg"  # 替换为实际验证码图片URL
+        
+        data = {
+            "url": image_url,
+            "probability": "False",
+            "png_fix": "False"
+        }
+        
+        # 发送请求
+        response = requests.post(url, headers=headers, data=data)
+        
+        # 输出结果
+        print(f"状态码: {response.status_code}")
+        print(f"响应内容: {json.dumps(response.json(), indent=2, ensure_ascii=False)}")
+        
+    except Exception as e:
+        print(f"请求失败: {str(e)}")
 
-    body, err := ioutil.ReadAll(resp.Body)
-    if err != nil {
-        panic(err)
+
+def demo_slide_match():
+    """
+    示例4: 滑动验证码匹配
+    """
+    print("\n===== 示例4: 滑动验证码匹配 =====")
+    
+    # 设置请求头
+    headers = {
+        "Authorization": f"Bearer {API_TOKEN}"
     }
+    
+    # API端点
+    url = f"{BASE_URL}/slide_match"
+    
+    try:
+        # 准备文件和参数
+        target_path = "target.png"  # 替换为实际滑块图片路径
+        background_path = "background.png"  # 替换为实际背景图片路径
+        
+        files = {
+            "target_file": open(target_path, "rb"),
+            "background_file": open(background_path, "rb")
+        }
+        
+        data = {
+            "simple_target": "false"
+        }
+        
+        # 发送请求
+        response = requests.post(url, headers=headers, files=files, data=data)
+        
+        # 输出结果
+        print(f"状态码: {response.status_code}")
+        print(f"响应内容: {json.dumps(response.json(), indent=2, ensure_ascii=False)}")
+        
+        # 关闭文件
+        files["target_file"].close()
+        files["background_file"].close()
+        
+    except Exception as e:
+        print(f"请求失败: {str(e)}")
 
-    fmt.Println(string(body))
-}
+
+def demo_detection():
+    """
+    示例5: 图像文本检测
+    """
+    print("\n===== 示例5: 图像文本检测 =====")
+    
+    # 设置请求头
+    headers = {
+        "Authorization": f"Bearer {API_TOKEN}"
+    }
+    
+    # API端点
+    url = f"{BASE_URL}/detection"
+    
+    try:
+        # 准备文件
+        image_path = "text_image.png"  # 替换为实际包含文本的图片路径
+        
+        files = {
+            "file": open(image_path, "rb")
+        }
+        
+        # 发送请求
+        response = requests.post(url, headers=headers, files=files)
+        
+        # 输出结果
+        print(f"状态码: {response.status_code}")
+        print(f"响应内容: {json.dumps(response.json(), indent=2, ensure_ascii=False)}")
+        
+        # 关闭文件
+        files["file"].close()
+        
+    except Exception as e:
+        print(f"请求失败: {str(e)}")
+
+
+def demo_token_header():
+    """
+    示例6: 使用token header进行身份验证
+    """
+    print("\n===== 示例6: 使用token header进行身份验证 =====")
+    
+    # 设置请求头 - 使用token而非Authorization
+    headers = {
+        "token": API_TOKEN
+    }
+    
+    # API端点
+    url = f"{BASE_URL}/ocr"
+    
+    try:
+        # 准备文件和参数
+        captcha_file_path = "captcha.png"  # 替换为实际验证码图片路径
+        
+        files = {
+            "file": open(captcha_file_path, "rb")
+        }
+        
+        data = {
+            "probability": "False"
+        }
+        
+        # 发送请求
+        response = requests.post(url, headers=headers, files=files, data=data)
+        
+        # 输出结果
+        print(f"状态码: {response.status_code}")
+        print(f"响应内容: {json.dumps(response.json(), indent=2, ensure_ascii=False)}")
+        
+        # 关闭文件
+        files["file"].close()
+        
+    except Exception as e:
+        print(f"请求失败: {str(e)}")
+
+
+if __name__ == "__main__":
+    print("验证码识别服务API调用示例")
+    print("=" * 50)
+    print(f"API地址: {BASE_URL}")
+    print(f"Token: {API_TOKEN}")
+    print("=" * 50)
+    
+    # 运行所有示例
+    demo_ocr_file()
+    demo_ocr_base64()
+    demo_ocr_from_url()
+    demo_slide_match()
+    demo_detection()
+    demo_token_header()
+    
+    print("\n所有示例已完成!")
 ```
-</details>
-
-<details>
-<summary>易语言</summary>
-
-```易语言
-.版本 2
-
-.程序集 调用OCR接口
-
-.子程序 主函数, 整数型
-.局部变量 请求头, QQ.HttpHeaders
-.局部变量 请求内容, QQ.HttpMultiData
-.局部变量 图片路径, 文本型
-.局部变量 图片数据, 字节集
-.局部变量 HTTP, QQ.Http
-
-图片路径 ＝ "path/to/your/image.jpg"
-图片数据 ＝ 读入文件 (图片路径)
-
-请求头.添加 ("Content-Type", "application/x-www-form-urlencoded")
-
-请求内容.添加文本 ("image", 到Base64 (图片数据))
-请求内容.添加文本 ("probability", "false")
-请求内容.添加文本 ("png_fix", "false")
-
-HTTP.发送POST请求 ("http://localhost:8000/ocr", 请求内容, 请求头)
-
-调试输出 (HTTP.获取返回文本())
-
-返回 (0)
-```
-</details>
-
-> **注意**：使用示例前，请确保安装了必要的依赖库，并根据实际环境修改服务器地址和图片路径。
-
-## ⚠️ 注意事项
-
-- 确保防火墙允许访问 8000 端口。
-- 生产环境建议配置 HTTPS 和适当的身份验证机制。
-- 定期更新 Docker 镜像以获取最新的安全补丁和功能更新。
-
-## 🔧 故障排除
-
-遇到问题？请检查以下几点：
-
-1. 确保 Docker 服务正在运行。
-2. 检查容器日志：
-   ```bash
-   docker logs ddddocr-api-container
-   ```
-3. 确保没有其他服务占用 8000 端口。
-
-> 如果问题仍然存在，请提交 issue 到本项目的 GitHub 仓库。
-
-## 📄 许可证
-
-本项目采用 MIT 许可证。详情请参见 [LICENSE](LICENSE) 文件。
-
----
-
-<p align="center">
-  Made with ❤️ by sml2h3
-</p>

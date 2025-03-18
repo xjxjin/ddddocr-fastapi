@@ -8,5 +8,6 @@ services:
     volumes:
       - .:/app
     environment:
+      - API_TOKEN=your_secure_token_here
       - DEBUG=1
     restart: always
